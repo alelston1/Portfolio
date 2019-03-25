@@ -13,7 +13,11 @@ int gameIntro();
 void setBoardEMPTY(char *board, int Board_Columns, int BOARD_ROWS);
 int getMove(char *board, int player, const char *PIECES, int Board_Columns, int BOARD_ROWS);
 int makeMove2(int move);
-int checkWinner();
+int checkWin(char *board, int Board_Columns, int BOARD_ROWS);
+int checkFour(char *board, int a, int b, int c, int d);
+int checkThree(char *board, int a, int b, int c, int d);
+int horizontalCheck(char *board, int Board_Columns, int BOARD_ROWS);
+int AIMove();
 
 
 int main(int argc, char *argv[]){
@@ -23,7 +27,7 @@ int main(int argc, char *argv[]){
 	int gameMode = 0;
 	int Board_Columns = 6;
 	int BOARD_ROWS = 7;
-	
+	int breaker = 0;
 	gameMode = gameIntro();
 
 	int player, turn, done = 0;
@@ -32,26 +36,80 @@ int main(int argc, char *argv[]){
 	printf("Now select a game board size. The recommended and minimum size is 6 rows and 7 columns, but can be no larger than 15 rows by 15 columns to fit the screen.");
 	printf("\nBoard Rows: ");
 	scanf("%d", &BOARD_ROWS);
+
+
+while(breaker = 0){
 	while(BOARD_ROWS > 15 || BOARD_ROWS < 6){
+		if(isdigit(BOARD_ROWS) != 0){
+			printf("Invalid board size. The default row will be used.\n");
+			breaker = 1;
+			break; }		
 		printf("That board size is invalid. Please select a row size between 6 and 15: ");
 		scanf("%d", &BOARD_ROWS); }
-	printf("\nBoard Columns: ");
-	scanf("%d", &Board_Columns);
-	while(Board_Columns > 15 || Board_Columns < 7){
-		printf("That board size is invalid. Please select a row size between 7 and 15: ");
-		scanf("%d", &Board_Columns); }
+}
 
+if(breaker == 0){
+	printf("Board Columns: ");
+	scanf("%d", &Board_Columns);
+}
+	
+while(breaker = 0){	
+	while(Board_Columns > 15 || Board_Columns < 7 && breaker != 1){
+		if(isdigit(Board_Columns) != 0){
+			printf("Invalid board size. The default column will be used.\n");
+			breaker = 1;
+			break; }
+		
+		printf("That board size is invalid. Please select a column size between 7 and 15: ");
+		scanf("%d", &Board_Columns);	}
+}
+
+if(breaker == 0){
+	char catchall[5];
+	printf("Press the '1' key and 'Enter' to continue: ");
+	scanf("%s", catchall);
+}
 
 	const char *PIECES = "XO";
 	char board[BOARD_ROWS * Board_Columns];
 	memset(board, ' ', BOARD_ROWS * Board_Columns);
 
+///////////////////////////////////
+	
 	if (gameMode == 1){
 		printf("This is ONE PLAYER GAME MODE");
+		printf("\n\nWelcome to one-player mode. Please enter a nickname below. No whitespaces can be entered. \n");
+		printf("Player one's name is: ");
+		scanf("%s", playerone);
+		printf("%s will be playing against me, Mykalo. Best of luck, I don't lose!", playerone);
+		
+		for(turn = 0; turn < BOARD_ROWS * Board_Columns && !done; turn++){
+			setBoardEMPTY(board, Board_Columns, BOARD_ROWS);
+			while(!AIMove(board, turn % 2, PIECES, Board_Columns, BOARD_ROWS)){
+				setBoardEMPTY(board, Board_Columns, BOARD_ROWS);
+				puts("**Column FULL!**\n"); }
+			done = checkWin(board, Board_Columns, BOARD_ROWS);
+		}
+		setBoardEMPTY(board, Board_Columns, BOARD_ROWS);
+
+		if(turn == BOARD_ROWS * Board_Columns && !done){
+			puts("It's a tie!"); }
+		else{
+			turn = turn - 1;
+			player = turn % 2 + 1;
+			if(player == 2){
+				printf("HA! I told you I would beat you, YOU LOSE!\n"); }
+			else{
+				printf("Rats... you've beat me this time. Congratulations %s!\n", playerone); }
+		} 
+	
 	}
 
+///////////////////////////////////////
+
 	else if (gameMode == 2){
-		printf("Welcome to two-player mode. Please enter a nickname below. No whitespaces can be entered. \n");
+		printf("\n\n\nWelcome to two-player mode. Please enter a nickname below. No whitespaces can be entered. \n");
+		
 		printf("Player one's name is: ");
 		scanf("%s", playerone);
 		printf("Player two's name is: ");
@@ -59,48 +117,34 @@ int main(int argc, char *argv[]){
 		printf("\n");
 		printf("%s will be X and %s will be O. Good Luck!\n", playerone, playertwo);
 
-
-////////////////
-
-
 		for(turn = 0; turn < BOARD_ROWS * Board_Columns && !done; turn++){
 			setBoardEMPTY(board, Board_Columns, BOARD_ROWS);
 			while(!getMove(board, turn % 2, PIECES, Board_Columns, BOARD_ROWS)){
 				setBoardEMPTY(board, Board_Columns, BOARD_ROWS);
 				puts("**Column FULL!**\n"); }
-			done = checkWinner(board);
+			done = checkWin(board, Board_Columns, BOARD_ROWS);
 		}
 		setBoardEMPTY(board, Board_Columns, BOARD_ROWS);
 
 		if(turn == BOARD_ROWS * Board_Columns && !done){
 			puts("It's a tie!"); }
 		else{
-			turn--;
-			printf("Player %d wins!\n", turn % 2 + 1); }
+			turn = turn - 1;
+			player = turn % 2 + 1;
+			if(player == 1){
+				printf("%s Wins!\n", playerone); }
+			else{
+				printf("%s Wins!\n", playertwo); }
+		}	}
 
+////////////////////////////////////////
 
-
-
-
-
-
-//		while(winner == 0){
-//			getMove(board, player, PIECES, Board_Columns, BOARD_ROWS);
-//			makeMove2(move);
-//			winner = checkWinner();
-//		}
-
-		if (winner == 1){
-			printf("\n\n%s WINS!", playerone); }
-		else {
-			printf("\n\n%s WINS!", playertwo); }
-	}
 	else {
 		printf("FATAL ERROR: GAME TERMINATED"); }
-		
-		setBoardEMPTY(board, Board_Columns, BOARD_ROWS);
-		return 0;
-	}
+
+
+	return 0;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,13 +229,197 @@ int getMove(char *board, int player, const char *PIECES, int Board_Columns, int 
 		}
 	}
 	return 0; }
+////////////////////////////////////////////////
+int AIMove(char *board, int player, const char *PIECES, int Board_Columns, int BOARD_ROWS){
+	int move = 0;
+	printf("%d", player);
+
+if(player+1 == 1){
+	move = getMove(board, player, PIECES, Board_Columns, BOARD_ROWS);
+	return 1; }
+else {
+	printf("Mykalo is moving");
+	int count = 0;
+	const int WIDTH = 1;
+	const int HEIGHT = 1;
+	int C = 0;
+/*
+	for(int i=0; i < BOARD_ROWS; i++){
+		for(int j=0; j< Board_Columns-3; j++){
+			count = Board_Columns * i + j;
+			if(checkThree(board, count, count + WIDTH, count + WIDTH * 2, count + WIDTH * 3)){
+		
+				C = count + WIDTH * 3;
+				for(int R = BOARD_ROWS - 1; R >= 0; R--){
+					if(board[Board_Columns * R + C] == ' '){
+						board[Board_Columns * R + C] = PIECES[player];
+				 		return 1;
+					} }
+				C = count + WIDTH * 2;
+			 	for(int R = BOARD_ROWS - 1; R >= 0; R--){
+					if(board[Board_Columns * R + C] == ' '){
+						board[Board_Columns * R + C] = PIECES[player];
+						return 1;
+					} }
+				C = count + WIDTH;
+				for(int R = BOARD_ROWS - 1; R >= 0; R--){
+					if(board[Board_Columns * R + C] == ' '){
+						board[Board_Columns * R + C] = PIECES[player];
+						return 1;
+					} }	
+				C = count;
+				for(int R = BOARD_ROWS - 1; R >= 0; R--){
+					if(board[Board_Columns * R + C] == ' '){
+						board[Board_Columns * R + C] = PIECES[player];
+						return 1;
+					} }
+		
+		
+			} } } }
+	return 1; }
+		
+*/
+
+		for(int i = 0; i < BOARD_ROWS; i++){
+			for(int j = 0; j < Board_Columns - 3; j++){
+				count = Board_Columns * i + j;
+
+			C = checkThree(board, count, count + WIDTH, count + WIDTH * 2, count + WIDTH * 3);
+				for(int R = BOARD_ROWS - 1; R >= 0; R--){
+					if(board[Board_Columns * R + C] == ' '){
+						board[Board_Columns * R + C] = PIECES[player];
+						return 1;	} } } } }
+						return 0; }
+	
+
+/*
+	count = 0;
+
+	for(int i=0; i < BOARD_ROWS - 3; i++){
+		for(int j=0; j < Board_Columns; j++){
+			count = Board_Columns * i + j;
+			if(checkThree(board, count, count + HEIGHT, count + HEIGHT * 2)){
+				C = count + HEIGHT * 3;
+				for(int R = BOARD_ROWS - 1; R >= 0; R--){
+					if(board[Board_Columns * R + C] == ' '){
+						board[Board_Columns * R + C] = PIECES[player];
+				return 1; } } } } } }
+
+*/	
+
+
+
+
 
 /////////////////////////////////////////////////
-int checkWinner(){
-	printf("Checking");
-	return 0; }
+int checkWin(char *board, int Board_Columns, int BOARD_ROWS){
+	return (horizontalCheck(board, Board_Columns, BOARD_ROWS)); }
+
+int checkFour(char *board, int a, int b, int c, int d){
+return (board[a] == board[b] && board[b] == board[c] && board[c] == board[d] && board[a] != ' '); }
+
+int checkThree(char *board, int a, int b, int c, int d){
+	if (board[a] == board[b] && board[b] == board[c] && board[c] != ' '){
+		return(board[d]); }
+	else if (board[a] == board[b] && board[b] == board[d] && board[d] != ' '){
+		return(board[c]); }
+	else if (board[a] == board[c] && board[c] == board[d] && board[d] != ' '){
+		return(board[b]); }
+	else if (board[b] == board[c] && board[c] == board[d] && board[d] != ' '){
+		return(board[a]); }
+
+	return 4; }
+
+/*
+	int count = 0;
+
+	if(board[a] == 'X'){
+		count = count + 1; }
+	if(board[b] == 'X'){
+		count = count + 1; }
+	if(board[c] == 'X'){
+		count = count + 1; }
+	if(board[d] == 'X'){
+		count = count + 1; }
+	count = 0;
+	if(board[a] == 'O'){
+		count = count + 1; }
+	if(board[b] == 'O'){
+		count = count + 1; }
+	if(board[c] == 'O'){
+		count = count + 1; }
+	if(board[d] == 'O'){
+		count = count + 1; }	
+	
+	if(count = 3){
+		return 1; }
+*/
+//return 0; }
+	
+//	return (board[a] == board[b] && board[b] == board[c] && board[c] == board[d] && board[a] != ' '); }
 
 
+int horizontalCheck(char *board, int Board_Columns, int BOARD_ROWS){
+	int row, col;
+	int count = 0;
+
+
+////////////	check horizontal /////////////////////////
+
+	const int WIDTH = 1;
+
+	for(int row=0; row < BOARD_ROWS; row++){
+		for(int col=0; col < Board_Columns - 3; col++){
+			count = Board_Columns * row + col;
+			if(checkFour(board, count, count + WIDTH, count + (WIDTH * 2), count + (WIDTH * 3))){
+				return 1; }
+		}
+	}
+
+/////////////	check vertical ///////////////////////////
+
+	const int HEIGHT = Board_Columns;
+
+	for(int row = 0; row < BOARD_ROWS - 3; row++){
+		for(int col = 0; col < Board_Columns; col++){
+			count = Board_Columns * row + col;
+			if(checkFour(board, count, count + HEIGHT, count + (HEIGHT * 2), count + (HEIGHT * 3))){
+				return 1; }
+		}
+	}
+
+//////////////	check diagonal upwards ///////////////////
+
+	const int D_RIGHT = Board_Columns - 1;
+	int hold = 0;
+
+	for(int row = 0; row < BOARD_ROWS - 3; row++){
+		for(int col = 0; col < Board_Columns; col++){
+			count = Board_Columns * row + col;
+			if(hold >=3 && checkFour(board, count, count + D_RIGHT, count + D_RIGHT * 2, count + D_RIGHT * 3)){
+				return 1; }
+			hold ++;
+		}
+		hold = 0;
+	}
+
+/////////////	check diagonal downwards /////////////////
+
+	const int D_LEFT = Board_Columns + 1;
+	hold = 0;
+
+	for(int row = 0; row < BOARD_ROWS - 3; row ++){
+		for(int col = 0; col < Board_Columns; col++){
+			count = Board_Columns * row + col;
+			if(checkFour(board, count, count + D_LEFT, count + D_LEFT * 2, count + D_LEFT * 3)){
+				return 1; }
+		}
+	}
+
+	return 0;
+}
+
+///////////////////////////////////////////////////////////
 
 
 
