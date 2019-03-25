@@ -243,9 +243,11 @@ else {
 	const int WIDTH = 1;
 	const int HEIGHT = 1;
 	int C = 0;
-/*
+
+
+	
 	for(int i=0; i < BOARD_ROWS; i++){
-		for(int j=0; j< Board_Columns-3; j++){
+		for(int j=0; j< Board_Columns; j++){
 			count = Board_Columns * i + j;
 			if(checkThree(board, count, count + WIDTH, count + WIDTH * 2, count + WIDTH * 3)){
 		
@@ -253,59 +255,57 @@ else {
 				for(int R = BOARD_ROWS - 1; R >= 0; R--){
 					if(board[Board_Columns * R + C] == ' '){
 						board[Board_Columns * R + C] = PIECES[player];
-				 		return 1;
-					} }
+				 		return 1; }
+					}	
 				C = count + WIDTH * 2;
 			 	for(int R = BOARD_ROWS - 1; R >= 0; R--){
 					if(board[Board_Columns * R + C] == ' '){
 						board[Board_Columns * R + C] = PIECES[player];
-						return 1;
-					} }
+						return 1; }
+				}
 				C = count + WIDTH;
 				for(int R = BOARD_ROWS - 1; R >= 0; R--){
 					if(board[Board_Columns * R + C] == ' '){
 						board[Board_Columns * R + C] = PIECES[player];
-						return 1;
-					} }	
+						return 1; }
+				}
 				C = count;
 				for(int R = BOARD_ROWS - 1; R >= 0; R--){
 					if(board[Board_Columns * R + C] == ' '){
 						board[Board_Columns * R + C] = PIECES[player];
-						return 1;
-					} }
+						return 1; }
+				}
 		
 		
-			} } } }
+			} 
+			else {
+				C = rand() % Board_Columns;
+				for(int R = BOARD_ROWS - 1; R >= 0; R--){
+					if(board[Board_Columns * R + C] == ' '){
+						board[Board_Columns * R + C] = PIECES[player];
+						return 1; } } }
+		
+		
+		} } }
 	return 1; }
 		
-*/
 
-		for(int i = 0; i < BOARD_ROWS; i++){
-			for(int j = 0; j < Board_Columns - 3; j++){
-				count = Board_Columns * i + j;
 
-			C = checkThree(board, count, count + WIDTH, count + WIDTH * 2, count + WIDTH * 3);
-				for(int R = BOARD_ROWS - 1; R >= 0; R--){
-					if(board[Board_Columns * R + C] == ' '){
-						board[Board_Columns * R + C] = PIECES[player];
-						return 1;	} } } } }
-						return 0; }
-	
 
 /*
-	count = 0;
+		for(int i = BOARD_ROWS; i >= 0; i--){
+			for(int j = 0; j < Board_Columns; j++){
+				count = Board_Columns * i + j;
 
-	for(int i=0; i < BOARD_ROWS - 3; i++){
-		for(int j=0; j < Board_Columns; j++){
-			count = Board_Columns * i + j;
-			if(checkThree(board, count, count + HEIGHT, count + HEIGHT * 2)){
-				C = count + HEIGHT * 3;
-				for(int R = BOARD_ROWS - 1; R >= 0; R--){
-					if(board[Board_Columns * R + C] == ' '){
-						board[Board_Columns * R + C] = PIECES[player];
-				return 1; } } } } } }
-
-*/	
+				if(checkThree(board, count, count + WIDTH, count + WIDTH * 2, count + WIDTH * 3)){	
+					if(board[Board_Columns * i + j] == ' '){
+						board[Board_Columns * i + j] = PIECES[player];
+						return 1; }
+			       	} } } }
+							
+							
+return 0; }
+*/
 
 
 
@@ -319,18 +319,6 @@ int checkFour(char *board, int a, int b, int c, int d){
 return (board[a] == board[b] && board[b] == board[c] && board[c] == board[d] && board[a] != ' '); }
 
 int checkThree(char *board, int a, int b, int c, int d){
-	if (board[a] == board[b] && board[b] == board[c] && board[c] != ' '){
-		return(board[d]); }
-	else if (board[a] == board[b] && board[b] == board[d] && board[d] != ' '){
-		return(board[c]); }
-	else if (board[a] == board[c] && board[c] == board[d] && board[d] != ' '){
-		return(board[b]); }
-	else if (board[b] == board[c] && board[c] == board[d] && board[d] != ' '){
-		return(board[a]); }
-
-	return 4; }
-
-/*
 	int count = 0;
 
 	if(board[a] == 'X'){
@@ -341,20 +329,14 @@ int checkThree(char *board, int a, int b, int c, int d){
 		count = count + 1; }
 	if(board[d] == 'X'){
 		count = count + 1; }
-	count = 0;
-	if(board[a] == 'O'){
-		count = count + 1; }
-	if(board[b] == 'O'){
-		count = count + 1; }
-	if(board[c] == 'O'){
-		count = count + 1; }
-	if(board[d] == 'O'){
-		count = count + 1; }	
-	
-	if(count = 3){
+
+	if(count == 3){
+		printf("COUNT 3");
 		return 1; }
-*/
-//return 0; }
+	else {	
+		return 0; }
+
+}
 	
 //	return (board[a] == board[b] && board[b] == board[c] && board[c] == board[d] && board[a] != ' '); }
 
