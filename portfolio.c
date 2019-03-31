@@ -18,7 +18,7 @@ int checkFour(char *board, int a, int b, int c, int d);
 int checkThree(char *board, int a, int b, int c, int d);
 int horizontalCheck(char *board, int Board_Columns, int BOARD_ROWS);
 int AIMove();
-
+int AIMove2();
 
 int main(int argc, char *argv[]){
 	char playerone[25];
@@ -33,19 +33,19 @@ int main(int argc, char *argv[]){
 	int player, turn, done = 0;
 	player = turn % 2 + 1;
 	
-	printf("Now select a game board size. The recommended and minimum size is 6 rows and 7 columns, but can be no larger than 15 rows by 15 columns to fit the screen.");
+	printf("Now select a game board size. The recommended minimum size is 6 rows and 7 columns. It is recommended to not exceed 15 x 15.");
 	printf("\nBoard Rows: ");
 	scanf("%d", &BOARD_ROWS);
 
 
 while(breaker = 0){
-	while(BOARD_ROWS > 15 || BOARD_ROWS < 6){
+	while(BOARD_ROWS >= 40 || BOARD_ROWS < 6){
 		if(isdigit(BOARD_ROWS) != 0){
 			printf("Invalid board size. The default row will be used.\n");
 			breaker = 1;
 			break; }		
-		printf("That board size is invalid. Please select a row size between 6 and 15: ");
-		scanf("%d", &BOARD_ROWS); }
+		printf("That board size is invalid. Please select a row size between 6 and 40: ");
+		scanf("%d", &BOARD_ROWS);	}
 }
 
 if(breaker == 0){
@@ -54,13 +54,13 @@ if(breaker == 0){
 }
 	
 while(breaker = 0){	
-	while(Board_Columns > 15 || Board_Columns < 7 && breaker != 1){
+	while(Board_Columns > 40 || Board_Columns < 7 && breaker != 1){
 		if(isdigit(Board_Columns) != 0){
 			printf("Invalid board size. The default column will be used.\n");
 			breaker = 1;
 			break; }
 		
-		printf("That board size is invalid. Please select a column size between 7 and 15: ");
+		printf("That board size is invalid. Please select a column size between 7 and 40: ");
 		scanf("%d", &Board_Columns);	}
 }
 
@@ -85,7 +85,7 @@ if(breaker == 0){
 		
 		for(turn = 0; turn < BOARD_ROWS * Board_Columns && !done; turn++){
 			setBoardEMPTY(board, Board_Columns, BOARD_ROWS);
-			while(!AIMove(board, turn % 2, PIECES, Board_Columns, BOARD_ROWS)){
+			while(!AIMove2(board, turn % 2, PIECES, Board_Columns, BOARD_ROWS)){
 				setBoardEMPTY(board, Board_Columns, BOARD_ROWS);
 				puts("**Column FULL!**\n"); }
 			done = checkWin(board, Board_Columns, BOARD_ROWS);
@@ -308,10 +308,163 @@ return 0; }
 */
 
 
-
-
-
 /////////////////////////////////////////////////
+int AIMove2(char *board, int player, const char *PIECES, int Board_Columns, int BOARD_ROWS){
+	int move = 0;
+	int lastMove = 0;
+	int count = 0;
+	int col = 0;
+	int moveCounter = 0;
+	const int Height = Board_Columns;
+	const int dleft = Board_Columns + 1;
+	const int dright = Board_Columns - 1;
+
+	if(player+1 == 1){
+		move = getMove(board, player, PIECES, Board_Columns, BOARD_ROWS);
+		return 1; }
+
+	else {
+		if (board[Board_Columns * BOARD_ROWS - 4] == ' '){
+			board[Board_Columns * BOARD_ROWS - 4] = PIECES[player];
+			return 1; }
+		else if(board[Board_Columns * BOARD_ROWS - 1] == ' '){
+			board[Board_Columns * BOARD_ROWS - 1] = PIECES[player];
+	       		return 1;	}
+		else{
+
+// Check for 3 in a row X X X ? or O O O ?			
+			for(int i = 0; i < BOARD_ROWS; i++){
+				for(int j = 0; j < Board_Columns; j++){
+					count = Board_Columns * i + j;
+					if(board[count] == board[count + 1] && board[count + 1] == board[count + 1 * 2] && board[count] != ' '){
+						if(board[count + 1 * 3] == ' '){	
+						
+//							count = Board_Columns * (i-1) + j;
+//							if(board[count + 1 * 3] == ' '){
+//								break; break; }
+			
+							count = Board_Columns * i + j;
+			
+							col = count + 1 * 3;
+							for(int row = BOARD_ROWS-1; row >= 0; row--){
+								if(board[Board_Columns * row + col] == ' '){
+									board[Board_Columns * row + col] = PIECES[player];
+									moveCounter = 1;
+									return 1; } } }
+				       		else break; } 	 } }
+// Check for 3 in a row ? X X X or ? O O O			
+			for(int i = 0; i < BOARD_ROWS; i++){
+				for(int j = 0; j < Board_Columns; j++){
+					count = Board_Columns * i + j;			
+					if(board[count + 1] == board[count + 1 * 2] && board[count + 1 * 2] == board[count + 1 * 3] && board[count + 1] != ' '){
+						if(board[count] == ' '){
+//
+//						count = Board_Columns * (i-1) + j;
+//						if(board[count] != ' ' || i == 0){
+//							count = Board_Columns * i + j;
+							col = count;
+							for(int row = BOARD_ROWS; row >= 0; row--){
+								if(board[Board_Columns * row + col] == ' '){
+									board[Board_Columns * row + col] = PIECES[player];
+									moveCounter = 1;
+									return 1; } } }
+							} } }
+
+// Check for 3 in a row X ? X X or O ? O O
+
+			for(int i = 0; i < BOARD_ROWS; i++){
+				for(int j = 0; j < Board_Columns; j++){
+					count = Board_Columns * i + j;
+					if(board[count] == board[count + 1 * 2] && board[count + 1 * 2] == board[count + 1 * 3] && board[count + 1 * 3] != ' '){
+						if(board[count + 1] == ' '){
+//						count = Board_Columns * (i-1) + j;
+//						if(board[count + 1] != ' '){
+//							printf("IN LOOP 2");
+//							count = Board_Columns * i + j;
+							col = count + 1;
+							for(int row = BOARD_ROWS-1; row >=0; row--){
+								if(board[Board_Columns * row + col] == ' '){
+									board[Board_Columns * row + col] = PIECES[player];
+									moveCounter = 1;
+									return 1; } } }
+							} } }
+
+// Check for 3 in a row X X ? X or O O ? O
+
+			for(int i = 0; i < BOARD_ROWS; i ++){
+				for(int j = 0; j < Board_Columns; j++){
+					count = Board_Columns * i + j;
+					if(board[count] == board[count + 1] && board[count + 1] == board[count + 1 * 3] && board[count + 1 * 3] != ' '){
+						if(board[count + 1 * 2] == ' '){
+							col = count + 1 * 2;
+							for(int row = BOARD_ROWS - 1; row >= 0; row--){
+								if(board[Board_Columns * row + col] == ' '){
+									board[Board_Columns * row + col] = PIECES[player];
+									moveCounter = 1;
+									return 1; } } }
+					} } }
+
+
+// Check for 3 in a row vertical
+
+			for(int i = 0; i < BOARD_ROWS; i++){
+				for(int j = 0; j < Board_Columns; j++){
+					count = Board_Columns * i + j;
+					if(board[count + 1] == board[count + 1 + Height] && board[count + 1 + Height] == board[count + 1 + (Height * 2)] && board[count + 1 + (Height * 2)] != ' '){
+
+						if(board[count + 1 - Height] == ' '){
+							board[count + 1 - Height] = PIECES[player];
+							moveCounter = 1;
+							return 1; }
+					} } }		
+
+			
+// Check for 3 in a row diagonal
+
+			for(int i = 0; i < BOARD_ROWS; i++){
+				for(int j = 0; j < Board_Columns; j++){
+					count = Board_Columns * i + j;
+					if(board[count] == board[count - dleft] && board[count - dleft] == board[count - dleft * 2] && board[count] != ' '){
+						if(board[count - dleft * 3] == ' '){
+							col = count - dleft * 3;
+							for(int row = BOARD_ROWS-1; row >= 0; row--){
+								if(board[Board_Columns * row + col] == ' '){
+									board[Board_Columns * row + col] = PIECES[player];
+									moveCounter = 1;
+									return 1; } } }
+					} } }
+
+// Check for 3 in a row diagonal 
+
+			for(int i = 0; i < BOARD_ROWS; i++){
+				for(int j = 0; j < Board_Columns; j++){
+					count = Board_Columns * i + j;
+					if(board[count] == board[count - dright] && board[count - dright] == board[count - dright * 2] && board[count - dright * 2] != ' '){
+						if(board[count - dright * 3] == ' '){
+							col = count - dright * 3;
+							for(int row = BOARD_ROWS-1; row >= 0; row--){
+								if(board[Board_Columns * row + col] == ' '){
+									board[Board_Columns * row + col] = PIECES[player];
+									moveCounter = 1;
+									return 1; } } }
+					} } }
+
+
+
+/// Make Random Move if No Best Move is Available
+			
+			if(moveCounter == 0){			
+				count = rand() % Board_Columns;
+					for(int r = BOARD_ROWS - 1; r >= 0; r--){
+						if(board[Board_Columns * r + count] == ' '){
+							board[Board_Columns * r + count] = PIECES[player];
+							return 1; } } } }
+		
+		
+		
+		return 1; }
+}
+/////////////////////////////////////////////////	
 int checkWin(char *board, int Board_Columns, int BOARD_ROWS){
 	return (horizontalCheck(board, Board_Columns, BOARD_ROWS)); }
 
