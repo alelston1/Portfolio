@@ -27,7 +27,7 @@
 ### Explanation of Code and Graph Structure
 My code is built on the idea that a graph is represented when each vertex is associated with the collection of its neighboring vertices or edges. Using this idea, I have implemented a basic adjacency list to determine the next best move of an AI computer player. The idea of the AI player is to not be too difficult, yet play both offense and defense against its opponent. The AI looks for vertices that result in a '3-in-a-row' match, then checks if placing a marker to make '4-in-a-row' is the best option. I would consider this approach to be a very basic depth-first search algorithm, with each vertices being marked as visited or unvisited based on their board state. A visited vertices will have either an 'X' or an 'O' marked. An unvisited vertices will remain in its initialized state of ' '.
 
-![Depth First Search] (https://res.cloudinary.com/practicaldev/image/fetch/s--BOANVe3t--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://thepracticaldev.s3.amazonaws.com/i/f043vm2qhzufdgkezj3e.png)
+![Depth First Search] (https://github.com/alelston1/Portfolio/blob/master/DFS.png)
 
 As far as functions go, I decided to leave each "next best move" for-loop in the function AIMove2() separated so that the code may be modified for future use. It will be easier to distinguish which for-loop is in control of each winning state if they are not merged together, although for the sake of code simplicity, they could have been modified and optomized.
 
